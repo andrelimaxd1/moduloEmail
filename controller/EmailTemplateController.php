@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Util\Functions as Util;
 use App\Model\EmailTemplate;
 use App\Dal\EmailTemplateDao;
-use App\View\emailTemplateView;
+use App\View\emailView;
 
 
 class EmailTemplateController {
@@ -27,7 +27,7 @@ class EmailTemplateController {
                 self::$msg = $e->getMessage();
             }
         }
-        emailTemplateView::formulario(self::$msg);
+        emailView::formulario(self::$msg);
     }
 
     public static function editar(): void {
