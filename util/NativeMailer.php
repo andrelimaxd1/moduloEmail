@@ -1,7 +1,6 @@
 <?php
 // util/NativeMailer.php
 // Implementação provisória com mail() nativo, SÓ para não travar o desenvolvimento
-// enquanto você confirma com o gestor como o SMTP real está configurado.
 // Quando souber, crie ex: PhpMailerAdapter implements MailerInterface e troque
 // a linha em MailerFactory::criar() lá embaixo.
 namespace App\Util;

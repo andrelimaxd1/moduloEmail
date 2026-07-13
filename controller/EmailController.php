@@ -68,13 +68,13 @@ class EmailController {
             echo json_encode([]);
             exit;
         }
-        // Ajuste para o Dao real que já lista Usuario/Cliente no seu sistema
-        $usuarios = UsuarioDao::buscarPorNomeOuEmail($q);
-        echo json_encode(array_map(fn($u) => [
-            'id' => $u->getId(),
-            'nome' => $u->getNome() ?? $u->getEmail(),
-            'email' => $u->getEmail(),
-        ], $usuarios));
-        exit;
+        // // Ajuste para o Dao real que já lista Usuario/Cliente no seu sistema
+        // $usuarios = UsuarioDao::buscarPorNomeOuEmail($q);
+        // echo json_encode(array_map(fn($u) => [
+        //     'id' => $u->getId(),
+        //     'nome' => $u->getNome() ?? $u->getEmail(),
+        //     'email' => $u->getEmail(),
+        // ], $usuarios));
+        // exit;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Util\Functions as Util;
 use App\Model\EmailTemplate;
 use App\Dal\EmailTemplateDao;
+use App\View\emailTemplateView;
 use App\View\emailView;
 
 
@@ -18,7 +19,7 @@ class EmailTemplateController {
                     null,
                     Util::preparaTexto($_POST["titulo"]),
                     Util::preparaTexto($_POST["assunto"]),
-                    $_POST["corpo"] // corpo em HTML: não passar por htmlentities
+                    $_POST["corpo"] 
                 );
                 EmailTemplateDao::cadastrar($t);
                 header("Location: ?p=template-list");
@@ -27,7 +28,7 @@ class EmailTemplateController {
                 self::$msg = $e->getMessage();
             }
         }
-        emailView::formulario(self::$msg);
+        emailTemplateView::formulario(self::$msg);
     }
 
     public static function editar(): void {

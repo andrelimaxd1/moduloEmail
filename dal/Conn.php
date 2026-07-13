@@ -8,7 +8,7 @@ use Exception;
 
 abstract class Conn {
     private static ?PDO $conn = null;
-    private static string $host = "localhost:3307";
+    private static string $host = "localhost";
     private static string $dbname = "moduloemail"; // ajuste para o nome real do banco
     private static string $user = "root";
     private static string $password = "";

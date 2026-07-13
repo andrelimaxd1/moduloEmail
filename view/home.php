@@ -2,21 +2,27 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel de Controle - Módulo de E-mails</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
-        .container { max-width: 600px; }
-        .menu-item { display: block; background: #f8f9fa; margin: 10px 0; padding: 15px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #333; font-weight: bold; }
-        .menu-item:hover { background: #e9ecef; }
-    </style>
+    <title>Módulo de E-mails - Vocare Conecta</title>
+    <link rel="stylesheet" href="./estilovc.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<body>
-    <div class="container">
-        <h1>Painel do Módulo de E-mails</h1>
-        <p>Selecione uma das opções abaixo para gerenciar ou realizar disparos:</p>
-        
-        <a href="?p=template-list" class="menu-item">📁 Gerenciar Templates de E-mail</a>
-        <a href="?p=email" class="menu-item">✉️ Ir para Tela de Envio / Disparos</a>
+<body class="bodyportal">
+    <div class="container-geral">
+        <div class="boxdentro" style="max-width: 600px; text-align: center; align-items: center; margin-top: 5em;">
+            
+            <h1 class="acessorapido"><i class="fas fa-envelope"></i> Módulo de E-mails</h1>
+            <p class="relatorioacessorapido" style="margin-bottom: 30px;">Selecione uma das opções abaixo para gerenciar ou realizar disparos</p>
+            
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="?p=template-list" class="btn btn-search">
+                    <i class="fas fa-file-alt"></i> Gerenciar Templates
+                </a>
+                <a href="?p=email" class="btn btn-export">
+                    <i class="fas fa-paper-plane"></i> Disparos de E-mail
+                </a>
+            </div>
+            
+        </div>
     </div>
 </body>
 </html>

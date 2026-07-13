@@ -1,10 +1,10 @@
-// Variáveis de estado para controlar os envios e seleções
+// Variáveis globais
 let templateIdSelecionado = null;
 let destinatariosSelecionados = [];
 
-// ==========================================
-// CONTROLO DO MODAL
-// ==========================================
+
+// CONTROLE Modal
+
 
 function abrirModalEnvio(dados = null) {
     const modal = document.getElementById('modalEnvio');
@@ -13,7 +13,6 @@ function abrirModalEnvio(dados = null) {
     modal.style.display = 'block';
     modalMsg.style.display = 'none';
 
-    // Se vierem dados (via botão "Usar neste envio"), preenche os campos
     if (dados) {
         templateIdSelecionado = dados.templateId;
         document.getElementById('inpAssunto').value = dados.assunto || '';
@@ -24,7 +23,6 @@ function abrirModalEnvio(dados = null) {
         document.getElementById('inpCorpo').value = '';
     }
 
-    // Limpa destinatários anteriores
     destinatariosSelecionados = [];
     document.getElementById('inpBuscaContato').value = '';
     document.getElementById('listaSugestoes').innerHTML = '';
@@ -35,7 +33,6 @@ function fecharModalEnvio() {
     document.getElementById('modalEnvio').style.display = 'none';
 }
 
-// Fechar modal ao clicar fora dele
 window.onclick = function(event) {
     const modal = document.getElementById('modalEnvio');
     if (event.target == modal) {
@@ -43,65 +40,79 @@ window.onclick = function(event) {
     }
 }
 
-// ==========================================
-// BUSCA DE CONTATOS E AUTOCORRECT
-// ==========================================
 
+// Adicionar
+
+async function processarAdicaoDestinatario() {
+    const inpBusca = document.getElementById('inpBuscaContato');
+    const q = inpBusca.value.trim();
+    const listaSugestoes = document.getElementById('listaSugestoes');
+
+    if (q === '') {
+        mostrarMensagem("Por favor, digite um e-mail ou nome para adicionar.", true);
+        return;
+    }
+
+    // 1. Se for um e-mail válido, adiciona diretamente (Não vai ao banco de dados)
+    if (q.includes('@') && q.includes('.')) {
+        adicionarDestinatario(q, null);
+        return;
+    }
+
+    // 2. Se for uma palavra curta, barra a pesquisa
+    if (q.length < 2) {
+        mostrarMensagem("Digite pelo menos 2 letras para buscar contatos.", true);
+        return;
+    }
+
+    // 3. Se for um nome (ex: "ana"), faz a busca no banco APENAS 1 VEZ ao clicar no botão
+    try {
+        listaSugestoes.innerHTML = '<li style="padding:5px;">Buscando contato...</li>';
+        
+        const resposta = await fetch(`?p=email-buscar-contatos&q=${encodeURIComponent(q)}`);
+        const contatos = await resposta.json();
+        
+        listaSugestoes.innerHTML = '';
+        
+        if (contatos.length === 0) {
+            listaSugestoes.innerHTML = '<li style="padding:5px; color:red;">Nenhum contato encontrado.</li>';
+            return;
+        }
+
+        // Mostra os contatos encontrados para o utilizador clicar
+        contatos.forEach(c => {
+            const li = document.createElement('li');
+            li.textContent = `${c.nome} (${c.email})`;
+            li.style.cursor = 'pointer';
+            li.style.padding = '8px';
+            li.style.borderBottom = '1px solid #eee';
+            
+            li.onclick = () => adicionarDestinatario(c.email, c.id);
+            listaSugestoes.appendChild(li);
+        });
+    } catch (error) {
+        console.error("Erro ao buscar", error);
+        listaSugestoes.innerHTML = '<li style="color:red; padding:5px;">Erro na comunicação com o servidor.</li>';
+    }
+}
+
+// Opcional: Permitir que o utilizador carregue no "Enter" no teclado para simular o clique no botão "Adicionar"
 document.addEventListener("DOMContentLoaded", () => {
     const inpBusca = document.getElementById('inpBuscaContato');
-    
     if(inpBusca) {
-        inpBusca.addEventListener('input', async (e) => {
-            const q = e.target.value.trim();
-            const listaSugestoes = document.getElementById('listaSugestoes');
-
-            if (q.length < 2) {
-                listaSugestoes.innerHTML = '';
-                return;
-            }
-
-            try {
-                // Faz a requisição GET ao controller para buscar os contatos
-                const resposta = await fetch(`?p=email-buscar-contatos&q=${encodeURIComponent(q)}`);
-                const contatos = await resposta.json();
-                
-                listaSugestoes.innerHTML = '';
-                
-                contatos.forEach(c => {
-                    const li = document.createElement('li');
-                    li.textContent = `${c.nome} (${c.email})`;
-                    li.style.cursor = 'pointer';
-                    // Ao clicar na sugestão, adiciona o contato aos destinatários
-                    li.onclick = () => adicionarDestinatario(c.email, c.id);
-                    listaSugestoes.appendChild(li);
-                });
-            } catch (error) {
-                console.error("Erro ao buscar contatos", error);
-            }
-        });
-
-        // Permite adicionar um e-mail livre ao pressionar "Enter"
         inpBusca.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                const emailDigitado = e.target.value.trim();
-                // Validação básica de e-mail
-                if (emailDigitado.includes('@') && emailDigitado.includes('.')) {
-                    adicionarDestinatario(emailDigitado, null);
-                } else {
-                    mostrarMensagem("Por favor, introduza um e-mail válido.", true);
-                }
+                processarAdicaoDestinatario();
             }
         });
     }
 });
 
-// ==========================================
-// GESTÃO DE DESTINATÁRIOS (TAGS)
-// ==========================================
+
+// Gestão de destinátario
 
 function adicionarDestinatario(email, usuarioId = null) {
-    // Evitar adicionar e-mails duplicados
     const jaExiste = destinatariosSelecionados.find(d => d.email === email);
     
     if (!jaExiste) {
@@ -109,9 +120,12 @@ function adicionarDestinatario(email, usuarioId = null) {
         atualizarTagsDestinatarios();
     }
     
-    // Limpa o campo de busca e a lista
+    // Limpa o campo para o próximo e-mail
     document.getElementById('inpBuscaContato').value = '';
     document.getElementById('listaSugestoes').innerHTML = '';
+    
+    // Remove mensagens de erro anteriores
+    document.getElementById('modalMsg').style.display = 'none'; 
 }
 
 function removerDestinatario(email) {
@@ -125,7 +139,6 @@ function atualizarTagsDestinatarios() {
     
     destinatariosSelecionados.forEach(d => {
         const span = document.createElement('span');
-        // Estilização básica da tag (podes ajustar o CSS)
         span.style.display = 'inline-block';
         span.style.background = '#e2e8f0';
         span.style.padding = '5px 10px';
@@ -138,16 +151,16 @@ function atualizarTagsDestinatarios() {
     });
 }
 
-// ==========================================
-// ENVIO DO E-MAIL
-// ==========================================
+
+// Disparo de email
+
 
 async function enviarEmail() {
     const assunto = document.getElementById('inpAssunto').value;
     const corpo = document.getElementById('inpCorpo').value;
 
     if (destinatariosSelecionados.length === 0) {
-        mostrarMensagem('Adicione pelo menos um destinatário.', true);
+        mostrarMensagem('Adicione pelo menos um destinatário na lista antes de enviar.', true);
         return;
     }
 
@@ -156,7 +169,6 @@ async function enviarEmail() {
         return;
     }
 
-    // Monta o payload no formato esperado pelo EmailController::enviar()
     const payload = {
         templateId: templateIdSelecionado,
         assunto: assunto,
@@ -164,14 +176,12 @@ async function enviarEmail() {
         destinatarios: destinatariosSelecionados
     };
 
-    mostrarMensagem('A enviar...', false, '#000');
+    mostrarMensagem('A disparar e-mails...', false, '#000');
 
     try {
         const resposta = await fetch('?p=email-enviar', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
@@ -179,8 +189,7 @@ async function enviarEmail() {
 
         if (resposta.ok && resultado.sucesso) {
             mostrarMensagem(`E-mail enviado! Sucesso: ${resultado.totalEnviado} | Falhas: ${resultado.totalFalha}`, false);
-            // Fecha o modal passado 2 segundos em caso de sucesso
-            setTimeout(fecharModalEnvio, 2000);
+            setTimeout(fecharModalEnvio, 2500);
         } else {
             mostrarMensagem(resultado.erro || 'Erro ao enviar os e-mails.', true);
         }
