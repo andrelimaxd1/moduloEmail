@@ -13,6 +13,8 @@ class emailView {
             <title>Disparo de E-mails - Vocare Conecta</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
             
+            <link rel="icon" type="image/x-icon" href="assets/img/favicon.png">
+
             <link rel="stylesheet" type="text/css" href="assets/estilovc.css">
             
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -42,31 +44,23 @@ class emailView {
 
             <nav class="navbar navbar-light fixed-top" style="z-index:9999; background: white; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 <div class="container-fluid">
-                    <div style="display: flex; align-items: center;">
-                        <img src="assets/img/vocaretax.png" style="margin-right:15px; height: 38px;" alt="Vocare Tax">
-                        <font class="topoincial1 fontmobile" style="margin-left:20px; font-size: 16px;">Painel Administrativo - <b>Módulo E-mail</b></font>
+                    <div style="display: flex; align-items: center; height: 100%;">  
+                    <img src="assets/img/vocaretax.png" style="margin-right:15px; height: 38px;" alt="Vocare Tax">   
+                    <span class="topoincial1 fontmobile" style="margin-left: 20px; padding-top: 0 !important; margin: 0; font-size: 20px; display: inline-block; line-height: 1">
+                            Painel Administrativo - <b>Módulo E-mail</b>
+                    </span>  
+                </div>
+                    <div class="topoinicial2">
+                        Você está conectado como <b>Usuário</b> 
+                        <img src="assets/img/semavatar.png" style="border-radius: 20px 20px; width:38px;height:38px;margin-right:10px; margin-left:10px;"> 
+                        | 
+                        <a href="#" class="mudarsenha-icon" style="color: #111e39; margin-left: 10px; margin-right: 10px;">
+                            <i class="fa-solid fa-lock fa-lg"></i>
+                        </a> 
+                        <a href="#" style="text-decoration: none; color: #111e39;">
+                            <i class="fa fa-sign-out" aria-hidden="true" style="margin-left:10px;"></i>Sair
+                        </a>
                     </div>
-                    <!-- Lado Direito: Usuário e Avatar -->
-                    <div class="topoinicial2" style="display: flex; align-items: center;">
-    
-                        Você está conectado como <b><?php echo $primeiroNome; ?></b> 
-    
-                        <!-- Link para o perfil e Imagem dinâmica do Avatar -->
-                    <a href="../infousuario.php">
-                    <img src="<?php echo $avatar; ?>" style="border-radius: 20px 20px; width: 38px; height: 38px; margin-right: 10px; margin-left: 10px;" alt="Avatar do Usuário">
-                    </a> | 
-    
-                <!-- Botão de alterar senha -->
-                    <a href="../alterasenhagestao.php" class="mudarsenha-icon" style="color: #111e39; margin-left: 10px; margin-right: 10px;">
-                    <i class="fa-solid fa-lock fa-lg"></i>
-                     </a> 
-    
-                <!-- Botão de Sair -->
-                    <a href="../logout.php" style="text-decoration: none; color: #111e39;">
-                    <i class="fa fa-sign-out" aria-hidden="true" style="margin-left: 10px;"></i>Sair
-                 </a>
-    
-</div>
                 </div>
             </nav>
 
@@ -131,13 +125,18 @@ class emailView {
                 <a href="?p=home" title="Voltar ao Menu Principal"><i class="fas fa-arrow-left fa-2x"></i></a>
             </div>
 
+            <!-- ================= MODAL DE ENVIO DE E-MAIL ================= -->
             <div id="modalEnvio" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17,30,57,0.85); z-index: 10000; overflow-y: auto;">
-                
-                <div class="incialnovo" style="margin: 5% auto; max-width: 750px; width: 90%; position: relative; text-align: left; padding: 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.5);">
-                    
-                    <span onclick="fecharModalEnvio()" style="position: absolute; right: 25px; top: 25px; font-size: 26px; cursor: pointer; color: #dc3545; transition: 0.3s;">
-                        <i class="fas fa-times-circle"></i>
-                    </span>
+    
+            <!-- Caixa do Modal Corrigida com overrides específicos -->
+            <div class="incialnovo" style="display: block !important; height: auto !important; margin: 5% auto !important; margin-top: 5% !important; max-width: 750px; width: 90%; position: relative; text-align: left; padding: 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.5);">
+        
+                <!-- Botão de Fechar -->
+            <span onclick="fecharModalEnvio()" style="position: absolute; right: 25px; top: 25px; font-size: 26px; cursor: pointer; color: #dc3545; transition: 0.3s;">
+            <i class="fas fa-times-circle"></i>
+            </span>
+        
+                <!-- O restante do conteúdo interno do seu modal continua exatamente igual aqui para baixo... -->
                     
                     <h2 class="txtmsgimportantes" style="font-size: 24px; border-bottom: 2px solid var(--color-barra); padding-bottom: 12px; margin-bottom: 25px; color: #111e39; font-weight: bold;">
                         <i class="fas fa-envelope-open-text"></i> Configurar Envio

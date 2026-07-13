@@ -18,6 +18,8 @@ class emailTemplateView {
             <title><?= $isEdit ? "Editar" : "Cadastrar" ?> Template - Vocare Conecta</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
             
+            <link rel="icon" type="image/x-icon" href="assets/img/favicon.png">
+
             <link rel="stylesheet" type="text/css" href="assets/estilovc.css">
             
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -122,6 +124,8 @@ class emailTemplateView {
             <title>Templates de E-mail - Vocare Conecta</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
             
+            <link rel="icon" type="image/x-icon" href="assets/img/favicon.png">                        
+            
             <link rel="stylesheet" type="text/css" href="assets/estilovc.css">
             
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -146,13 +150,18 @@ class emailTemplateView {
 
             <nav class="navbar navbar-light fixed-top" style="z-index:9999; background: white; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 <div class="container-fluid">
-                    <div style="display: flex; align-items: center;">
-                        <img src="assets/img/vocaretax.png" style="margin-right:15px; height: 38px;" alt="Vocare Tax">
-                        <font class="topoincial1 fontmobile" style="margin-left:20px; font-size: 16px;">Painel Administrativo - <b>Módulo E-mail</b></font>
-                    </div>
+                    <div style="display: flex; align-items: center; height: 100%;">
+    
+            <img src="assets/img/vocaretax.png" style="margin-right:15px; height: 38px;" alt="Vocare Tax">
+    
+            <span class="topoincial1 fontmobile" style="margin-left: 20px; padding-top: 0 !important; margin: 0; font-size: 20px; display: inline-block; line-height: 1;">
+                     Painel Administrativo - <b>Módulo E-mail</b>
+            </span>
+    
+            </div>
                     <div class="topoinicial2">
                         Você está conectado como <b>Usuário</b> 
-                        <img src="https://via.placeholder.com/38" style="border-radius: 20px 20px; width:38px;height:38px;margin-right:10px; margin-left:10px;"> 
+                        <img src="assets/img/semavatar.png" style="border-radius: 20px 20px; width:38px;height:38px;margin-right:10px; margin-left:10px;"> 
                         | 
                         <a href="#" class="mudarsenha-icon" style="color: #2D5F8B; margin-left: 10px; margin-right: 10px;">
                             <i class="fa-solid fa-lock fa-lg"></i>
