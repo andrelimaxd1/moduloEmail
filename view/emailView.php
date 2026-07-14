@@ -102,13 +102,13 @@ class emailView {
                                             <td style="text-align: left; font-weight: 500;"><?= htmlspecialchars($t->getTitulo()) ?></td>
                                             <td style="text-align: left; color: #555;"><?= htmlspecialchars($t->getAssunto()) ?></td>
                                             <td>
-                                                <button type="button" class="botaoopcoesempresa" style="margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%;"
-                                                    onclick='abrirModalEnvio(<?= json_encode([
-                                                        "templateId" => $t->getId(),
-                                                        "assunto" => $t->getAssunto(),
-                                                        "corpo" => $t->getCorpo(),
-                                                    ]) ?>)'>
-                                                    <i class="fas fa-check-circle"></i> Usar Template
+                                                <button type="button" class="botaoopcoesempresa" style="margin: 0 auto; display: inline-flex; align-items: center;          justify-content: center; gap: 6px; width: 100%;"
+                                                        onclick="abrirModalEnvio(<?= htmlspecialchars(json_encode([
+                                                         'templateId' => $t->getId(),
+                                                            'assunto' => $t->getAssunto(),
+                                                             'corpo' => $t->getCorpo(),
+                                                                 ]), ENT_QUOTES, 'UTF-8') ?>)">
+                                                 <i class="fas fa-check-circle"></i> Usar Template
                                                 </button>
                                             </td>
                                         </tr>

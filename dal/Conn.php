@@ -14,18 +14,22 @@ abstract class Conn {
     private static string $password = "";
 
     public static function getConn(): PDO {
-        if (self::$conn === null) {
-            try {
-                self::$conn = new PDO(
-                    "mysql:host=" . self::$host . ";dbname=" . self::$dbname,
-                    self::$user,
-                    self::$password,
-                    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-                );
-            } catch (PDOException $e) {
-                throw new Exception("Erro ao conectar ao banco de dados: " . $e->getMessage(), 1);
-            }
+    if (self::$conn === null) {
+        try {
+            
+            self::$conn = new PDO(
+                "mysql:host=" . self::$host . ";dbname=" . self::$dbname . ";charset=utf8mb4",
+                self::$user,
+                self::$password,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
+                ]
+            );
+        } catch (PDOException $e) {
+            throw new Exception("Erro ao conectar ao banco de dados: " . $e->getMessage(), 1);
         }
-        return self::$conn;
     }
+    return self::$conn;
+}
 }

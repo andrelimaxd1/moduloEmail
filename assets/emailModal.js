@@ -188,6 +188,10 @@ async function enviarEmail() {
 
     mostrarMensagem('A disparar e-mails...', false, '#111e39');
 
+    const btnEnviar = document.querySelector('button[onclick="enviarEmail()"]');
+    btnEnviar.disabled = true;
+    btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A enviar...';
+
     try {
         const resposta = await fetch('?p=email-enviar', {
             method: 'POST',
@@ -205,6 +209,13 @@ async function enviarEmail() {
     } catch (error) {
         console.error(error);
         mostrarMensagem('Erro de conexão com o servidor ao tentar enviar.', true);
+        
+    } finally {
+        
+        if(btnEnviar) {
+            btnEnviar.disabled = false;
+            btnEnviar.innerHTML = '<i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Iniciar Disparo';
+        }
     }
 }
 
@@ -218,7 +229,7 @@ function mostrarMensagem(msg, isError, corFixa = null) {
     } else {
         modalMsg.style.color = isError ? 'red' : 'green';
     }
-
+}
     
 // 2. Função que dispara quando o usuário escolhe um arquivo no input
 function adicionarAnexos() {
@@ -270,5 +281,4 @@ function fecharModalEnvio() {
 
     arquivosSelecionados = []; 
     renderizarListaAnexos();
-}
 }

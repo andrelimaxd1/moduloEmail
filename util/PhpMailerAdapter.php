@@ -43,18 +43,28 @@ class PhpMailerAdapter implements MailerInterface {
             
             // 4. LÓGICA DE ANEXOS (Múltiplos arquivos)
             
-            if (!empty($anexos['name']) && is_array($anexos['name'])) {
-                for ($i = 0; $i < count($anexos['name']); $i++) {
-                    
-                    if ($anexos['error'][$i] === UPLOAD_ERR_OK) {
-                        
-                        $tmpName = $anexos['tmp_name'][$i];
-                        $fileName = $anexos['name'][$i];
-                        
-                        $mail->addAttachment($tmpName, $fileName);
-                    }
-                }
+            // util/PhpMailerAdapter.php
+        if (!empty($anexos['name']) && is_array($anexos['name'])) {
+            $tamanhoMaximo = 5 * 1024 * 1024; // 5 MB
+            $extensoesPermitidas = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg', 'zip'];
+
+        for ($i = 0; $i < count($anexos['name']); $i++) {
+        if ($anexos['error'][$i] === UPLOAD_ERR_OK) {
+            $tmpName = $anexos['tmp_name'][$i];
+            $fileName = $anexos['name'][$i];
+            $fileSize = $anexos['size'][$i];
+            
+            $extensao = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+            if ($fileSize <= $tamanhoMaximo && in_array($extensao, $extensoesPermitidas)) {
+                $mail->addAttachment($tmpName, $fileName);
+            } else {
+                // Opcional: Você pode retornar um erro ou apenas ignorar o anexo inválido
+                return ['sucesso' => false, 'erro' => "Arquivo {$fileName} não permitido ou muito grande."];
             }
+        }
+    }
+}
 
             
             // 5. DISPARO
