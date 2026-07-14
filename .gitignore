@@ -1,0 +1,14 @@
+# Dependências do Composer (Essencial)
+/vendor/
+
+# Arquivos de variáveis de ambiente (Credenciais de banco, Mailtrap, etc.)
+.env
+.env.*
+
+# Arquivos gerados por IDEs (Opcional, mas recomendado)
+.vscode/
+.idea/
+
+# Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db

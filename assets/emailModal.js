@@ -1,6 +1,8 @@
 // Variáveis globais
 let templateIdSelecionado = null;
 let destinatariosSelecionados = [];
+let arquivosSelecionados = [];
+
 
 
 // CONTROLE Modal
@@ -176,13 +178,20 @@ async function enviarEmail() {
         destinatarios: destinatariosSelecionados
     };
 
-    mostrarMensagem('A disparar e-mails...', false, '#000');
+    const formData = new FormData();
+    
+    formData.append('dados', JSON.stringify(payload));
+
+    arquivosSelecionados.forEach(arquivo => {
+        formData.append('anexos[]', arquivo);
+    });
+
+    mostrarMensagem('A disparar e-mails...', false, '#111e39');
 
     try {
         const resposta = await fetch('?p=email-enviar', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: formData 
         });
 
         const resultado = await resposta.json();
@@ -209,4 +218,57 @@ function mostrarMensagem(msg, isError, corFixa = null) {
     } else {
         modalMsg.style.color = isError ? 'red' : 'green';
     }
+
+    
+// 2. Função que dispara quando o usuário escolhe um arquivo no input
+function adicionarAnexos() {
+    const input = document.getElementById('inpAnexos');
+    const novosArquivos = Array.from(input.files);
+
+    // Adiciona os novos arquivos no nosso Array (evitando duplicados)
+    novosArquivos.forEach(novoArquivo => {
+        const jaExiste = arquivosSelecionados.some(arq => arq.name === novoArquivo.name && arq.size === novoArquivo.size);
+        if (!jaExiste) {
+            arquivosSelecionados.push(novoArquivo);
+        }
+    });
+
+    // Limpa o input nativo do HTML para permitir que a pessoa escolha mais arquivos depois
+    input.value = '';
+
+    renderizarListaAnexos();
+}
+
+// 3. Remove o arquivo da memória pelo número da posição (index)
+function removerAnexo(index) {
+    arquivosSelecionados.splice(index, 1);
+    renderizarListaAnexos();
+}
+
+// 4. Desenha as tags visuais na tela
+    function renderizarListaAnexos() {
+    const container = document.getElementById('listaAnexosContainer');
+    container.innerHTML = ''; // Limpa a tela antes de desenhar de novo
+
+    arquivosSelecionados.forEach((arquivo, index) => {
+        const tag = document.createElement('div');
+        tag.style.cssText = 'background: #e9ecef; border: 1px solid #ced4da; padding: 5px 10px; border-radius: 15px; font-size: 13px; display: flex; align-items: center; gap: 8px;';
+        
+        tag.innerHTML = `
+            <i class="fas fa-file-alt" style="color: #6c757d;"></i>
+            <span style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${arquivo.name}">${arquivo.name}</span>
+            <i class="fas fa-times" style="color: #dc3545; cursor: pointer;" onclick="removerAnexo(${index})"></i>
+        `;
+        
+        container.appendChild(tag);
+    });
+}
+
+function fecharModalEnvio() {
+    document.getElementById('modalEnvio').style.display = 'none';
+    
+
+    arquivosSelecionados = []; 
+    renderizarListaAnexos();
+}
 }

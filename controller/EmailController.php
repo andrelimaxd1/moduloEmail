@@ -19,46 +19,51 @@ class EmailController {
 
     // Chamado pelo modal (JS envia JSON via fetch)
     public static function enviar(): void {
-        header('Content-Type: application/json; charset=utf-8');
+    header('Content-Type: application/json; charset=utf-8');
 
-        try {
-            $input = json_decode(file_get_contents("php://input"), true);
+    try {
+    
+        $input = json_decode($_POST['dados'] ?? '{}', true);
 
-            $assunto = trim($input['assunto'] ?? '');
-            $corpo = $input['corpo'] ?? '';
-            $templateId = isset($input['templateId']) && $input['templateId'] !== ''
-                ? (int)$input['templateId'] : null;
+        $assunto = trim($input['assunto'] ?? '');
+        $corpo = $input['corpo'] ?? '';
+        $templateId = isset($input['templateId']) && $input['templateId'] !== ''
+            ? (int)$input['templateId'] : null;
 
-            // destinatarios: [{ email: "...", usuarioId: 5|null }, ...]
-            $destinatarios = $input['destinatarios'] ?? [];
+        $destinatarios = $input['destinatarios'] ?? [];
 
-            $email = Email::criar($templateId, $assunto, $corpo, $destinatarios);
+        $email = Email::criar($templateId, $assunto, $corpo, $destinatarios);
 
-            $mailer = MailerFactory::criar();
-            $resultados = [];
-            foreach ($email->getDestinatarios() as $d) {
-                $resultados[] = $mailer->enviar($d['email'], $email->getAssunto(), $email->getCorpo());
-            }
+        
+        $arquivosUpload = $_FILES['anexos'] ?? [];
 
-            $emailId = EmailDao::registrarEnvio($email, $resultados);
-
-            $falhas = array_filter($resultados, fn($r) => !$r['sucesso']);
-
-            echo json_encode([
-                'sucesso' => count($falhas) === 0,
-                'emailId' => $emailId,
-                'totalEnviado' => count($resultados) - count($falhas),
-                'totalFalha' => count($falhas),
-            ]);
-        } catch (\InvalidArgumentException $e) {
-            http_response_code(422);
-            echo json_encode(['sucesso' => false, 'erro' => $e->getMessage()]);
-        } catch (\Exception $e) {
-            http_response_code(500);
-            echo json_encode(['sucesso' => false, 'erro' => 'Erro interno ao enviar.']);
+        $mailer = MailerFactory::criar();
+        $resultados = [];
+        
+        foreach ($email->getDestinatarios() as $d) {
+        
+            $resultados[] = $mailer->enviar($d['email'], $email->getAssunto(), $email->getCorpo(), $arquivosUpload);
         }
-        exit;
+
+        $emailId = EmailDao::registrarEnvio($email, $resultados);
+
+        $falhas = array_filter($resultados, fn($r) => !$r['sucesso']);
+
+        echo json_encode([
+            'sucesso' => count($falhas) === 0,
+            'emailId' => $emailId,
+            'totalEnviado' => count($resultados) - count($falhas),
+            'totalFalha' => count($falhas),
+        ]);
+    } catch (\InvalidArgumentException $e) {
+        http_response_code(422);
+        echo json_encode(['sucesso' => false, 'erro' => $e->getMessage()]);
+    } catch (\Exception $e) {
+        http_response_code(500);
+        echo json_encode(['sucesso' => false, 'erro' => 'Erro interno ao enviar.']);
     }
+    exit;
+}
 
     // AJAX de autocomplete: ?p=email-buscar-contatos&q=ana
     public static function buscarContatos(): void {

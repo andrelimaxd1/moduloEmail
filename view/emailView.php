@@ -152,6 +152,18 @@ class emailView {
                         <textarea id="inpCorpo" class="search-input" rows="8" style="width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-family: monospace;"></textarea>
                     </div>
 
+                    <div style="margin-bottom: 20px;">
+                        <label class="txtup1" style="font-weight: 500; margin-bottom: 5px; display: block;">
+                        <i class="fas fa-paperclip"></i> Anexar Arquivos:
+                        </label>
+    
+                        <input type="file" id="inpAnexos" class="search-input" multiple onchange="adicionarAnexos()" style="width: 100%; box-sizing: border-box; padding: 10px; border: 1px dashed #ccc; border-radius: 5px; background-color: #f8f9fa;">
+    
+                        <small style="color: #6c757d;">Pressione CTRL para selecionar mais de um arquivo.</small>
+
+                    <div id="listaAnexosContainer" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                    </div>
+
                     <div style="margin-bottom: 20px; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
                         <label class="txtup1" style="font-weight: bold; margin-bottom: 10px; display: block; color: #111e39;">
                             <i class="fas fa-users"></i> Adicionar Destinatários:
