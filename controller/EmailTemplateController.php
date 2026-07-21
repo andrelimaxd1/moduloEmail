@@ -7,6 +7,7 @@ use App\Model\EmailTemplate;
 use App\Dal\EmailTemplateDao;
 use App\View\emailTemplateView;
 use App\View\emailView;
+use App\Util\UploadService;
 
 
 class EmailTemplateController {
@@ -15,12 +16,17 @@ class EmailTemplateController {
     public static function cadastrar(): void {
         if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST["titulo"])) {
             try {
+
+                $jsonAnexos = UploadService::uploadAnexosMultiplos($_FILES['anexos'] ?? null, 'templates');
+
                 $t = EmailTemplate::criar(
                     null,
                     Util::preparaTexto($_POST["titulo"]),
                     Util::preparaTexto($_POST["assunto"]),
-                    $_POST["corpo"] 
+                    $_POST["corpo"],
+                    $jsonAnexos
                 );
+                
                 EmailTemplateDao::cadastrar($t);
                 header("Location: ?p=template-list");
                 exit;
@@ -39,13 +45,25 @@ class EmailTemplateController {
 
         if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST["id"])) {
             try {
-                $template = EmailTemplate::criar(
+
+                $templateAntigo = EmailTemplateDao::buscarPorId((int)$_POST["id"]);
+                $jsonAnexos = $templateAntigo->getAnexos();
+
+                $novosAnexos = UploadService::uploadAnexosMultiplos($_FILES['anexos'] ?? null, 'templates');
+                
+                if ($novosAnexos !== null) {
+                    $jsonAnexos = $novosAnexos;
+                }
+
+                $t = EmailTemplate::criar(
                     (int)$_POST["id"],
                     Util::preparaTexto($_POST["titulo"]),
                     Util::preparaTexto($_POST["assunto"]),
-                    $_POST["corpo"]
+                    $_POST["corpo"],
+                    $jsonAnexos
                 );
-                EmailTemplateDao::editar($template);
+                
+                EmailTemplateDao::editar($t);
                 header("Location: ?p=template-list");
                 exit;
             } catch (\Exception $e) {
@@ -61,14 +79,21 @@ class EmailTemplateController {
     }
 
     public static function deletar(): void {
-        if (isset($_GET["del"])) {
-            self::listar((int)$_GET["del"]);
-            return;
-        }
-        if (isset($_GET["deletar"])) {
-            EmailTemplateDao::excluir((int)$_GET["deletar"]);
-            header("Location: ?p=template-list");
-            exit;
-        }
+    if (isset($_GET["del"])) {
+        self::listar((int)$_GET["del"]);
+        return;
     }
+    
+    if (isset($_GET["deletar"])) {
+        $idDeletar = (int)$_GET["deletar"];
+        
+        $template = EmailTemplateDao::buscarPorId($idDeletar);
+        
+        UploadService::deletarArquivos($template->getAnexos());
+        
+        EmailTemplateDao::excluir($idDeletar);
+        header("Location: ?p=template-list");
+        exit;
+    }
+}
 }

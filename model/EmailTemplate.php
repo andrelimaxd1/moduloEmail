@@ -7,17 +7,20 @@ class EmailTemplate {
     private string $titulo;
     private string $assunto;
     private string $corpo;
+    private ?string $anexos = null;
 
     private function __construct(){}
 
-    public static function criar(?int $id, string $titulo, string $assunto, string $corpo): static {
-        $t = new static();
-        $t->id = $id;
-        $t->setTitulo($titulo);
-        $t->setAssunto($assunto);
-        $t->setCorpo($corpo);
-        return $t;
-    }
+    public static function criar(?int $id, string $titulo, string $assunto, string $corpo, ?string $anexos = null): static {
+    $t = new static();
+    $t->id = $id;
+    $t->setTitulo($titulo);
+    $t->setAssunto($assunto);
+    $t->setCorpo($corpo);
+    $t->setAnexos($anexos); 
+    
+    return $t;
+}
 
     public function getId(): ?int { return $this->id; }
     public function getTitulo(): string { return $this->titulo; }
@@ -43,5 +46,13 @@ class EmailTemplate {
             throw new \InvalidArgumentException("O corpo do e-mail é obrigatório.");
         }
         $this->corpo = $corpo;
+    }
+
+    public function getAnexos(): ?string {
+        return $this->anexos;
+    }
+
+    public function setAnexos(?string $anexos): void {
+        $this->anexos = $anexos;
     }
 }

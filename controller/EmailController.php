@@ -17,12 +17,10 @@ class EmailController {
         emailView::listar($templates, self::$msg);
     }
 
-    // Chamado pelo modal (JS envia JSON via fetch)
     public static function enviar(): void {
     header('Content-Type: application/json; charset=utf-8');
 
     try {
-    
         $input = json_decode($_POST['dados'] ?? '{}', true);
 
         $assunto = trim($input['assunto'] ?? '');
@@ -34,15 +32,36 @@ class EmailController {
 
         $email = Email::criar($templateId, $assunto, $corpo, $destinatarios);
 
-        
+        $anexosDoTemplate = [];
+        if ($templateId) {
+            $template = \App\Dal\EmailTemplateDao::buscarPorId($templateId);
+            if ($template && $template->getAnexos()) {
+                $lista = json_decode($template->getAnexos(), true);
+                if (is_array($lista)) {
+                    foreach ($lista as $caminho) {
+                        $caminhoAbsoluto = __DIR__ . '/../' . $caminho;
+                        if (file_exists($caminhoAbsoluto) && is_file($caminhoAbsoluto)) {
+                            $anexosDoTemplate[] = $caminhoAbsoluto;
+                        }
+                    }
+                }
+            }
+        }
+
         $arquivosUpload = $_FILES['anexos'] ?? [];
 
         $mailer = MailerFactory::criar();
         $resultados = [];
         
         foreach ($email->getDestinatarios() as $d) {
-        
-            $resultados[] = $mailer->enviar($d['email'], $email->getAssunto(), $email->getCorpo(), $arquivosUpload);
+            
+            $resultados[] = $mailer->enviar(
+                $d['email'], 
+                $email->getAssunto(), 
+                $email->getCorpo(), 
+                $arquivosUpload, 
+                $anexosDoTemplate 
+            );
         }
 
         $emailId = EmailDao::registrarEnvio($email, $resultados);
