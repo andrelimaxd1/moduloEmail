@@ -4,7 +4,6 @@ namespace App\View;
 
 class emailView {
     public static function listar(array $templates, ?string $msg = null): void {
-        global $primeiroNome, $avatar;
         ?>
         <!DOCTYPE html>
         <html lang="pt-BR">
@@ -14,9 +13,7 @@ class emailView {
             <meta name="viewport" content="width=device-width, initial-scale=1">
             
             <link rel="icon" type="image/x-icon" href="assets/img/favicon.png">
-
             <link rel="stylesheet" type="text/css" href="assets/estilovc.css">
-            
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
             
@@ -34,7 +31,7 @@ class emailView {
                     font-family: 'Ubuntu', sans-serif;
                     color: var(--text-color);
                 }
-                /* Estilização extra para a lista de sugestões do Autocomplete */
+                
                 #listaSugestoes li:hover {
                     background-color: #f1f1f1;
                 }
@@ -42,32 +39,12 @@ class emailView {
         </head>
         <body class="bodypainel">
 
-            <nav class="navbar navbar-light fixed-top" style="z-index:9999; background: white; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <div class="container-fluid">
-                    <div style="display: flex; align-items: center; height: 100%;">  
-                    <img src="assets/img/vocaretax.png" style="margin-right:15px; height: 38px;" alt="Vocare Tax">   
-                    <span class="topoincial1 fontmobile" style="margin-left: 20px; padding-top: 0 !important; margin: 0; font-size: 20px; display: inline-block; line-height: 1">
-                            Painel Administrativo - <b>Módulo E-mail</b>
-                    </span>  
-                </div>
-                    <div class="topoinicial2">
-                        Você está conectado como <b>Usuário</b> 
-                        <img src="assets/img/semavatar.png" style="border-radius: 20px 20px; width:38px;height:38px;margin-right:10px; margin-left:10px;"> 
-                        | 
-                        <a href="#" class="mudarsenha-icon" style="color: #111e39; margin-left: 10px; margin-right: 10px;">
-                            <i class="fa-solid fa-lock fa-lg"></i>
-                        </a> 
-                        <a href="#" style="text-decoration: none; color: #111e39;">
-                            <i class="fa fa-sign-out" aria-hidden="true" style="margin-left:10px;"></i>Sair
-                        </a>
-                    </div>
-                </div>
-            </nav>
+            <?php require __DIR__ . '/../menu.php'; ?>
 
-            <center>
-                <div class="container-geral" style="padding-top: 6em; padding-bottom: 3em;">
+            <div style="display: flex; justify-content: center; align-items: flex-start; width: 100%; padding-top: 120px; padding-bottom: 50px;">
+                <div class="container-geral" style="width: 100%; display: flex; justify-content: center;">
                     
-                    <div class="incialnovo" style="width: 1000px; max-width: 95vw; margin-top: 1%; text-align: left; padding: 30px;">
+                    <div class="incialnovo" style="width: 1000px; max-width: 95vw; text-align: left; padding: 30px;">
                         
                         <?php if ($msg !== null): ?>
                             <div class="sucess-message" style="margin-bottom: 20px; padding: 15px; border-radius: 5px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; text-align: center;">
@@ -102,13 +79,14 @@ class emailView {
                                             <td style="text-align: left; font-weight: 500;"><?= htmlspecialchars($t->getTitulo()) ?></td>
                                             <td style="text-align: left; color: #555;"><?= htmlspecialchars($t->getAssunto()) ?></td>
                                             <td>
-                                                <button type="button" class="botaoopcoesempresa" style="margin: 0 auto; display: inline-flex; align-items: center;          justify-content: center; gap: 6px; width: 100%;"
-                                                        onclick="abrirModalEnvio(<?= htmlspecialchars(json_encode([
-                                                         'templateId' => $t->getId(),
-                                                            'assunto' => $t->getAssunto(),
-                                                             'corpo' => $t->getCorpo(),
-                                                                 ]), ENT_QUOTES, 'UTF-8') ?>)">
-                                                 <i class="fas fa-check-circle"></i> Usar Template
+                                                <button type="button" class="botaoopcoesempresa" style="margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%;"
+                                                    onclick="abrirModalEnvio(<?= htmlspecialchars(json_encode([
+                                                        'templateId' => $t->getId(),
+                                                        'assunto'    => $t->getAssunto(),
+                                                        'corpo'      => $t->getCorpo(),
+                                                        'anexos'     => !empty($t->getAnexos()) ? (is_array($t->getAnexos()) ? $t->getAnexos() : json_decode($t->getAnexos(), true)) : []
+                                                        ]), ENT_QUOTES, 'UTF-8') ?>)">
+                                                    <i class="fas fa-check-circle"></i> Usar Template
                                                 </button>
                                             </td>
                                         </tr>
@@ -117,27 +95,22 @@ class emailView {
                                 </tbody>
                             </table>
                         </div>
+
                     </div>
                 </div>
-            </center>
+            </div>
 
             <div class="retornar">
                 <a href="?p=home" title="Voltar ao Menu Principal"><i class="fas fa-arrow-left fa-2x"></i></a>
             </div>
 
-            <!-- ================= MODAL DE ENVIO DE E-MAIL ================= -->
             <div id="modalEnvio" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17,30,57,0.85); z-index: 10000; overflow-y: auto;">
-    
-            <!-- Caixa do Modal Corrigida com overrides específicos -->
-            <div class="incialnovo" style="display: block !important; height: auto !important; margin: 5% auto !important; margin-top: 5% !important; max-width: 750px; width: 90%; position: relative; text-align: left; padding: 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.5);">
-        
-                <!-- Botão de Fechar -->
-            <span onclick="fecharModalEnvio()" style="position: absolute; right: 25px; top: 25px; font-size: 26px; cursor: pointer; color: #dc3545; transition: 0.3s;">
-            <i class="fas fa-times-circle"></i>
-            </span>
-        
-                <!-- O restante do conteúdo interno do seu modal continua exatamente igual aqui para baixo... -->
+                <div class="incialnovo" style="display: block !important; height: auto !important; margin: 5% auto !important; margin-top: 5% !important; max-width: 750px; width: 90%; position: relative; text-align: left; padding: 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.5);">
                     
+                    <span onclick="fecharModalEnvio()" style="position: absolute; right: 25px; top: 25px; font-size: 26px; cursor: pointer; color: #dc3545; transition: 0.3s;">
+                        <i class="fas fa-times-circle"></i>
+                    </span>
+
                     <h2 class="txtmsgimportantes" style="font-size: 24px; border-bottom: 2px solid var(--color-barra); padding-bottom: 12px; margin-bottom: 25px; color: #111e39; font-weight: bold;">
                         <i class="fas fa-envelope-open-text"></i> Configurar Envio
                     </h2>
@@ -154,14 +127,11 @@ class emailView {
 
                     <div style="margin-bottom: 20px;">
                         <label class="txtup1" style="font-weight: 500; margin-bottom: 5px; display: block;">
-                        <i class="fas fa-paperclip"></i> Anexar Arquivos:
+                            <i class="fas fa-paperclip"></i> Anexar Arquivos:
                         </label>
-    
                         <input type="file" id="inpAnexos" class="search-input" multiple onchange="adicionarAnexos()" style="width: 100%; box-sizing: border-box; padding: 10px; border: 1px dashed #ccc; border-radius: 5px; background-color: #f8f9fa;">
-    
                         <small style="color: #6c757d;">Pressione CTRL para selecionar mais de um arquivo.</small>
-
-                    <div id="listaAnexosContainer" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                        <div id="listaAnexosContainer" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
                     </div>
 
                     <div style="margin-bottom: 20px; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">

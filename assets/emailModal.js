@@ -1,11 +1,8 @@
 // Variáveis globais
 let templateIdSelecionado = null;
 let destinatariosSelecionados = [];
-let arquivosSelecionados = [];
-
-
-
-// CONTROLE Modal
+let arquivosSelecionados = []; 
+let anexosDoTemplate = [];     
 
 
 function abrirModalEnvio(dados = null) {
@@ -15,10 +12,17 @@ function abrirModalEnvio(dados = null) {
     modal.style.display = 'block';
     modalMsg.style.display = 'none';
 
+    arquivosSelecionados = [];
+    anexosDoTemplate = [];
+
     if (dados) {
         templateIdSelecionado = dados.templateId;
         document.getElementById('inpAssunto').value = dados.assunto || '';
         document.getElementById('inpCorpo').value = dados.corpo || '';
+        
+        if (dados.anexos && Array.isArray(dados.anexos)) {
+            anexosDoTemplate = dados.anexos;
+        }
     } else {
         templateIdSelecionado = null;
         document.getElementById('inpAssunto').value = '';
@@ -28,11 +32,16 @@ function abrirModalEnvio(dados = null) {
     destinatariosSelecionados = [];
     document.getElementById('inpBuscaContato').value = '';
     document.getElementById('listaSugestoes').innerHTML = '';
+    
     atualizarTagsDestinatarios();
+    renderizarListaAnexos(); 
 }
 
 function fecharModalEnvio() {
     document.getElementById('modalEnvio').style.display = 'none';
+    arquivosSelecionados = []; 
+    anexosDoTemplate = [];
+    renderizarListaAnexos();
 }
 
 window.onclick = function(event) {
@@ -41,9 +50,6 @@ window.onclick = function(event) {
         fecharModalEnvio();
     }
 }
-
-
-// Adicionar
 
 async function processarAdicaoDestinatario() {
     const inpBusca = document.getElementById('inpBuscaContato');
@@ -55,19 +61,16 @@ async function processarAdicaoDestinatario() {
         return;
     }
 
-    // 1. Se for um e-mail válido, adiciona diretamente (Não vai ao banco de dados)
     if (q.includes('@') && q.includes('.')) {
         adicionarDestinatario(q, null);
         return;
     }
 
-    // 2. Se for uma palavra curta, barra a pesquisa
     if (q.length < 2) {
         mostrarMensagem("Digite pelo menos 2 letras para buscar contatos.", true);
         return;
     }
 
-    // 3. Se for um nome (ex: "ana"), faz a busca no banco APENAS 1 VEZ ao clicar no botão
     try {
         listaSugestoes.innerHTML = '<li style="padding:5px;">Buscando contato...</li>';
         
@@ -81,7 +84,6 @@ async function processarAdicaoDestinatario() {
             return;
         }
 
-        // Mostra os contatos encontrados para o utilizador clicar
         contatos.forEach(c => {
             const li = document.createElement('li');
             li.textContent = `${c.nome} (${c.email})`;
@@ -98,7 +100,6 @@ async function processarAdicaoDestinatario() {
     }
 }
 
-// Opcional: Permitir que o utilizador carregue no "Enter" no teclado para simular o clique no botão "Adicionar"
 document.addEventListener("DOMContentLoaded", () => {
     const inpBusca = document.getElementById('inpBuscaContato');
     if(inpBusca) {
@@ -111,9 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
-// Gestão de destinátario
-
 function adicionarDestinatario(email, usuarioId = null) {
     const jaExiste = destinatariosSelecionados.find(d => d.email === email);
     
@@ -122,11 +120,8 @@ function adicionarDestinatario(email, usuarioId = null) {
         atualizarTagsDestinatarios();
     }
     
-    // Limpa o campo para o próximo e-mail
     document.getElementById('inpBuscaContato').value = '';
     document.getElementById('listaSugestoes').innerHTML = '';
-    
-    // Remove mensagens de erro anteriores
     document.getElementById('modalMsg').style.display = 'none'; 
 }
 
@@ -153,9 +148,62 @@ function atualizarTagsDestinatarios() {
     });
 }
 
+function adicionarAnexos() {
+    const input = document.getElementById('inpAnexos');
+    const novosArquivos = Array.from(input.files);
 
-// Disparo de email
+    novosArquivos.forEach(novoArquivo => {
+        const jaExiste = arquivosSelecionados.some(arq => arq.name === novoArquivo.name && arq.size === novoArquivo.size);
+        if (!jaExiste) {
+            arquivosSelecionados.push(novoArquivo);
+        }
+    });
 
+    input.value = '';
+    renderizarListaAnexos();
+}
+
+function removerAnexo(index) {
+    arquivosSelecionados.splice(index, 1);
+    renderizarListaAnexos();
+}
+
+function removerAnexoTemplate(index) {
+    anexosDoTemplate.splice(index, 1);
+    renderizarListaAnexos();
+}
+
+function renderizarListaAnexos() {
+    const container = document.getElementById('listaAnexosContainer');
+    container.innerHTML = ''; 
+
+    anexosDoTemplate.forEach((anexo, index) => {
+
+        let nomeAnexo = typeof anexo === 'string' ? anexo : (anexo.nome_arquivo || anexo.nome || 'Anexo do Template');
+
+        const tag = document.createElement('div');
+        tag.style.cssText = 'background: #fff3cd; border: 1px solid #ffe69c; padding: 5px 10px; border-radius: 15px; font-size: 13px; display: flex; align-items: center; gap: 8px;';
+        
+        tag.innerHTML = `
+            <i class="fas fa-cloud" style="color: #664d03;" title="Anexo salvo no servidor"></i>
+            <span style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; color: #664d03;" title="${nomeAnexo}">${nomeAnexo}</span>
+            <i class="fas fa-times" style="color: #dc3545; cursor: pointer;" onclick="removerAnexoTemplate(${index})"></i>
+        `;
+        container.appendChild(tag);
+    });
+
+    arquivosSelecionados.forEach((arquivo, index) => {
+        const tag = document.createElement('div');
+        tag.style.cssText = 'background: #e9ecef; border: 1px solid #ced4da; padding: 5px 10px; border-radius: 15px; font-size: 13px; display: flex; align-items: center; gap: 8px;';
+        
+        tag.innerHTML = `
+            <i class="fas fa-file-upload" style="color: #2d5f8b;" title="Novo arquivo"></i>
+            <span style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${arquivo.name}">${arquivo.name}</span>
+            <i class="fas fa-times" style="color: #dc3545; cursor: pointer;" onclick="removerAnexo(${index})"></i>
+        `;
+        container.appendChild(tag);
+    });
+}
 
 async function enviarEmail() {
     const assunto = document.getElementById('inpAssunto').value;
@@ -175,11 +223,11 @@ async function enviarEmail() {
         templateId: templateIdSelecionado,
         assunto: assunto,
         corpo: corpo,
-        destinatarios: destinatariosSelecionados
+        destinatarios: destinatariosSelecionados,
+        anexosTemplate: anexosDoTemplate 
     };
 
     const formData = new FormData();
-    
     formData.append('dados', JSON.stringify(payload));
 
     arquivosSelecionados.forEach(arquivo => {
@@ -209,9 +257,7 @@ async function enviarEmail() {
     } catch (error) {
         console.error(error);
         mostrarMensagem('Erro de conexão com o servidor ao tentar enviar.', true);
-        
     } finally {
-        
         if(btnEnviar) {
             btnEnviar.disabled = false;
             btnEnviar.innerHTML = '<i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Iniciar Disparo';
@@ -229,56 +275,4 @@ function mostrarMensagem(msg, isError, corFixa = null) {
     } else {
         modalMsg.style.color = isError ? 'red' : 'green';
     }
-}
-    
-// 2. Função que dispara quando o usuário escolhe um arquivo no input
-function adicionarAnexos() {
-    const input = document.getElementById('inpAnexos');
-    const novosArquivos = Array.from(input.files);
-
-    // Adiciona os novos arquivos no nosso Array (evitando duplicados)
-    novosArquivos.forEach(novoArquivo => {
-        const jaExiste = arquivosSelecionados.some(arq => arq.name === novoArquivo.name && arq.size === novoArquivo.size);
-        if (!jaExiste) {
-            arquivosSelecionados.push(novoArquivo);
-        }
-    });
-
-    // Limpa o input nativo do HTML para permitir que a pessoa escolha mais arquivos depois
-    input.value = '';
-
-    renderizarListaAnexos();
-}
-
-// 3. Remove o arquivo da memória pelo número da posição (index)
-function removerAnexo(index) {
-    arquivosSelecionados.splice(index, 1);
-    renderizarListaAnexos();
-}
-
-// 4. Desenha as tags visuais na tela
-    function renderizarListaAnexos() {
-    const container = document.getElementById('listaAnexosContainer');
-    container.innerHTML = ''; // Limpa a tela antes de desenhar de novo
-
-    arquivosSelecionados.forEach((arquivo, index) => {
-        const tag = document.createElement('div');
-        tag.style.cssText = 'background: #e9ecef; border: 1px solid #ced4da; padding: 5px 10px; border-radius: 15px; font-size: 13px; display: flex; align-items: center; gap: 8px;';
-        
-        tag.innerHTML = `
-            <i class="fas fa-file-alt" style="color: #6c757d;"></i>
-            <span style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${arquivo.name}">${arquivo.name}</span>
-            <i class="fas fa-times" style="color: #dc3545; cursor: pointer;" onclick="removerAnexo(${index})"></i>
-        `;
-        
-        container.appendChild(tag);
-    });
-}
-
-function fecharModalEnvio() {
-    document.getElementById('modalEnvio').style.display = 'none';
-    
-
-    arquivosSelecionados = []; 
-    renderizarListaAnexos();
 }

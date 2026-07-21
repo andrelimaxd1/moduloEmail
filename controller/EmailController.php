@@ -33,16 +33,19 @@ class EmailController {
         $email = Email::criar($templateId, $assunto, $corpo, $destinatarios);
 
         $anexosDoTemplate = [];
-        if ($templateId) {
-            $template = \App\Dal\EmailTemplateDao::buscarPorId($templateId);
-            if ($template && $template->getAnexos()) {
-                $lista = json_decode($template->getAnexos(), true);
-                if (is_array($lista)) {
-                    foreach ($lista as $caminho) {
-                        $caminhoAbsoluto = __DIR__ . '/../' . $caminho;
-                        if (file_exists($caminhoAbsoluto) && is_file($caminhoAbsoluto)) {
-                            $anexosDoTemplate[] = $caminhoAbsoluto;
-                        }
+        $anexosFront = $input['anexosTemplate'] ?? [];
+
+        if (!empty($anexosFront)) {
+            foreach ($anexosFront as $anexo) {
+                $caminho = is_array($anexo) ? ($anexo['nome_arquivo'] ?? $anexo['nome'] ?? $anexo['caminho'] ?? '') : $anexo;
+                
+                if (!empty($caminho)) {
+                    $caminhoAbsoluto = __DIR__ . '/../' . $caminho;
+                    
+                    if (file_exists($caminhoAbsoluto) && is_file($caminhoAbsoluto)) {
+                        $anexosDoTemplate[] = $caminhoAbsoluto;
+                    } else {
+                        error_log("Anexo de template não localizado no servidor: " . $caminhoAbsoluto);
                     }
                 }
             }
