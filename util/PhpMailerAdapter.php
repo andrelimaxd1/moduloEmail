@@ -1,7 +1,6 @@
 <?php
 namespace App\Util;
 
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -22,7 +21,11 @@ class PhpMailerAdapter implements MailerInterface {
             $mail->CharSet    = 'UTF-8';
 
             $mail->setFrom('sistema@vocareconecta.com.br', 'Vocare Conecta (Teste)');
-            $mail->addAddress($destinatario);
+
+            $emailLimpo = trim($destinatario);
+            if (!empty($emailLimpo)) {
+                $mail->addAddress($emailLimpo);
+            }
             
             $mail->isHTML(true);
             $mail->Subject = $assunto;
@@ -52,7 +55,6 @@ class PhpMailerAdapter implements MailerInterface {
             
             if (!empty($anexosTemplate)) {
                 foreach ($anexosTemplate as $caminhoArquivo) {
-
                     $mail->addAttachment($caminhoArquivo);
                 }
             }

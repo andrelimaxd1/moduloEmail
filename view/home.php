@@ -46,11 +46,11 @@
   <?php require __DIR__ . '/../menu.php'; ?>
 
   
-  <div style="display: flex; justify-content: center; align-items: flex-start; width: 100%; padding-top: 120px; padding-bottom: 50px;">
-    <div class="container-geral" style="width: 100%; display: flex; justify-content: center;">
-      
-     
-      <div class="incialnovo" style="width: 800px; max-width: 95vw; text-align: center; padding: 40px 20px;">
+  <div style="display: flex; justify-content: center; align-items: flex-start; width: 100%; padding-top: 100px; padding-bottom: 50px; box-sizing: border-box;">
+    
+    <div class="container-geral" style="width: 100%; display: flex; justify-content: center; padding: 0 15px; box-sizing: border-box;">
+        
+        <div class="incialnovo" style="width: 100%; max-width: 700px; margin: 0 auto; padding: 30px; box-sizing: border-box; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center;">
         
         
         <h1 style="font-family: 'Ubuntu', sans-serif; font-size: 28px; color: #111e39; font-weight: 500; margin-bottom: 10px;">
@@ -61,7 +61,7 @@
         </p>
 
         
-        <div class="modulos-grid" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+        <div class="modulos-grid" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
 
         
           <div class="modulo-item">

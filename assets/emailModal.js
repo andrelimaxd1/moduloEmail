@@ -179,7 +179,9 @@ function renderizarListaAnexos() {
 
     anexosDoTemplate.forEach((anexo, index) => {
 
-        let nomeAnexo = typeof anexo === 'string' ? anexo : (anexo.nome_arquivo || anexo.nome || 'Anexo do Template');
+        let caminhoBruto = typeof anexo === 'string' ? anexo : (anexo.nome_arquivo || anexo.nome || 'Anexo do Template');
+        
+        let nomeAnexo = caminhoBruto.split('/').pop();
 
         const tag = document.createElement('div');
         tag.style.cssText = 'background: #fff3cd; border: 1px solid #ffe69c; padding: 5px 10px; border-radius: 15px; font-size: 13px; display: flex; align-items: center; gap: 8px;';

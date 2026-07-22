@@ -41,10 +41,9 @@ class emailView {
 
             <?php require __DIR__ . '/../menu.php'; ?>
 
-            <div style="display: flex; justify-content: center; align-items: flex-start; width: 100%; padding-top: 120px; padding-bottom: 50px;">
-                <div class="container-geral" style="width: 100%; display: flex; justify-content: center;">
-                    
-                    <div class="incialnovo" style="width: 1000px; max-width: 95vw; text-align: left; padding: 30px;">
+            <div style="display: flex; justify-content: center; align-items: flex-start; width: 100%; padding-top: 100px; padding-bottom: 50px; box-sizing: border-box;">
+            <div class="container-geral" style="width: 100%; display: flex; justify-content: center; padding: 0 15px; box-sizing: border-box;">
+            <div class="incialnovo" style="width: 100%; max-width: 1000px; margin: 0 auto; text-align: left; padding: 30px; box-sizing: border-box;">
                         
                         <?php if ($msg !== null): ?>
                             <div class="sucess-message" style="margin-bottom: 20px; padding: 15px; border-radius: 5px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; text-align: center;">

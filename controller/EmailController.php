@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Model\Email;
 use App\Dal\EmailTemplateDao;
 use App\Dal\EmailDao;
-use App\Dal\UsuarioDao; // supondo que exista, ajuste ao seu Dao real de contatos
+use App\Dal\UsuarioDao; 
 use App\Util\MailerFactory;
 use App\View\emailView;
 
@@ -65,6 +65,9 @@ class EmailController {
                 $arquivosUpload, 
                 $anexosDoTemplate 
             );
+
+            
+            sleep(6); 
         }
 
         $emailId = EmailDao::registrarEnvio($email, $resultados);
@@ -76,18 +79,24 @@ class EmailController {
             'emailId' => $emailId,
             'totalEnviado' => count($resultados) - count($falhas),
             'totalFalha' => count($falhas),
+            'detalhes_falhas' => $falhas 
         ]);
     } catch (\InvalidArgumentException $e) {
         http_response_code(422);
         echo json_encode(['sucesso' => false, 'erro' => $e->getMessage()]);
     } catch (\Exception $e) {
         http_response_code(500);
-        echo json_encode(['sucesso' => false, 'erro' => 'Erro interno ao enviar.']);
+        
+        echo json_encode([
+            'sucesso' => false, 
+            'erro' => $e->getMessage(), 
+            'arquivo' => $e->getFile(), 
+            'linha' => $e->getLine()
+        ]); 
     }
     exit;
 }
 
-    // AJAX de autocomplete: ?p=email-buscar-contatos&q=ana
     public static function buscarContatos(): void {
         header('Content-Type: application/json; charset=utf-8');
         $q = trim($_GET['q'] ?? '');
